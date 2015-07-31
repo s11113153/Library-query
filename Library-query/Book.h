@@ -12,11 +12,11 @@
 #include <stdio.h>
 
 struct Book {
-  uint16_t book_id;
+  int book_id;
   std::string authors;
   std::string book_name;
   std::string publisher;
-  uint16_t    year;
+  int         year;
   std::string place;
 
   struct FiledIndex {

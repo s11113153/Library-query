@@ -8,8 +8,19 @@
 
 #include "DataBase.h"
 
-DataBase::Build * build_instance = NULL;
 
+// ------------------------------------------------
+// MARK: - Database Table Book
+vector<Book>  DataBase::Table::book_record = {};
+// ------------------------------------------------
+
+
+
+
+// -----------------------------------------------------------------------------------------
+// MARK: - Build class func
+
+DataBase::Build * build_instance = NULL;
 
 bool pushToBookRecord(string bookData[], size_t size) {
   bool b = (size == Book::FiledIndex::FiledSize) ? true : false;
@@ -22,9 +33,7 @@ bool pushToBookRecord(string bookData[], size_t size) {
   book.place     = bookData[Book::FiledIndex::place];
   book.publisher = bookData[Book::FiledIndex::publisher];
   book.book_name = bookData[Book::FiledIndex::book_name];
-
-  DataBase::Table table;
-  table.book_record.push_back(book);
+  DataBase::table.book_record.push_back(book);
   return true;
 }
 
@@ -45,13 +54,19 @@ DataBase::Build::Build(string table_path, void(*callback)(int, std::string msg))
       callback(EXIT_FAILURE, "格式不符合");
     }
   }
+  callback(EXIT_SUCCESS, "載入完成");
 }
+// -----------------------------------------------------------------------------------------
 
 
 
+// ---------------------------------------------------------------------------------
+// MARK: - Database class static func
 DataBase::Build * DataBase::load(string table_path, void (*callback)(int, string)) {
   if (build_instance == NULL)
       build_instance = new Build(table_path, callback);
   return build_instance;
 }
+// ---------------------------------------------------------------------------------
+
 

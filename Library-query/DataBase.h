@@ -23,10 +23,11 @@ class DataBase {
   private:
     DataBase();
   public:
-    struct Table {
+    static class Table {
       public:
-        vector<Book> book_record;
-    };
+        static vector<Book> book_record;
+    } table;
+
     class Build {
       public:
         Build(std::string table_path, void(*callback)(int, std::string));
