@@ -16,10 +16,8 @@ vector<Book>  DataBase::Table::book_record = {};
 
 
 
-
 // -----------------------------------------------------------------------------------------
 // MARK: - Build class func
-
 DataBase::Build * build_instance = NULL;
 
 bool pushToBookRecord(string bookData[], size_t size) {
@@ -48,13 +46,15 @@ DataBase::Build::Build(string table_path, void(*callback)(int, std::string msg))
     std::string readLine = string(c);
     std::istringstream split(readLine);
 
-    for (int index = 0; std::getline(split, readLine, split_char); bookData[index++] = readLine);
+    for (int index = 0;
+         std::getline(split, readLine, split_char);
+         bookData[index++] = readLine
+    );
 
     if (!pushToBookRecord(bookData, sizeof(bookData) / sizeof(bookData[0]))) {
-      callback(EXIT_FAILURE, "格式不符合");
+      callback(EXIT_FAILURE, "格式不符合\n");
     }
   }
-  callback(EXIT_SUCCESS, "載入完成");
 }
 // -----------------------------------------------------------------------------------------
 
@@ -65,6 +65,7 @@ DataBase::Build::Build(string table_path, void(*callback)(int, std::string msg))
 DataBase::Build * DataBase::load(string table_path, void (*callback)(int, string)) {
   if (build_instance == NULL)
       build_instance = new Build(table_path, callback);
+  callback(EXIT_SUCCESS, "載入完成\n");
   return build_instance;
 }
 // ---------------------------------------------------------------------------------

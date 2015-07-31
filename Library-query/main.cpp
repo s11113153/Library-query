@@ -19,9 +19,11 @@ void log(string tag, string msg);
 
 const string TABLE_PATH = "/Users/xuyouren/Desktop/book_db.dat";
 
+DataBase::Build *build;
+
 int main(int argc, const char * argv[]) {
-  DataBase::Build *build = DataBase::load(TABLE_PATH, callback);
-  
+  build = DataBase::load(TABLE_PATH, callback);  
+  LibrarySystem::launch(*build);
   return EXIT_SUCCESS;
 }
 

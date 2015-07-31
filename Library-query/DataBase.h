@@ -31,8 +31,6 @@ class DataBase {
     class Build {
       public:
         Build(std::string table_path, void(*callback)(int, std::string));
-
-        void quit();
       private:
         Build * build_instance;
     };

@@ -10,5 +10,42 @@
 #define __Library_query__LibrarySystem__
 
 #include <stdio.h>
+#include "DataBase.h"
+#include <fstream>
+#include <map>
+
+class LibrarySystem {
+public:
+  enum Command {
+    Display, Insert, Delete, Modify, Copy, Filter, Query, Save, Quit, None
+  };
+  static void launch(DataBase::Build build);
+
+private:
+  static map<string, Command> commands;
+
+  static inline Command getCommand(std::string str) {
+    map<string, Command>::iterator it = commands.find(str);
+    if (it != commands.end())
+        return  it->second;
+    return None;
+  }
+
+  struct CommandFormatSize {
+    static const int Display = 0;
+    static const int Insert  = 6;
+    static const int Delete  = 1;
+    static const int Modify  = 3;
+    static const int Copy    = 0;
+//    static const int Filter  = 1;
+    static const int Query   = 0;
+    static const int Save    = 0;
+    static const int Quit    = 0;
+  };
+
+  static void printlnLog(string msg);
+  static void proces(Command command, vector<string> inputs, size_t size);
+};
+
 
 #endif /* defined(__Library_query__LibrarySystem__) */
