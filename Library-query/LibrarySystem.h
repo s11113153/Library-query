@@ -45,6 +45,7 @@ private:
 
   static void printlnLog(string msg);
   static void proces(CommandContent cc);
+  static int getBookFieldIndex(string key);
 };
 
 
