@@ -12,6 +12,9 @@
 // ------------------------------------------------
 // MARK: - Database Table Book
 vector<Book>  DataBase::Table::book_record = {};
+vector<Book>  DataBase::Table::tmp = {};
+vector<Book>  DataBase::Table::tmp2 = {};
+string        DataBase::Table::path = "";
 // ------------------------------------------------
 
 
@@ -38,6 +41,9 @@ bool pushToBookRecord(string bookData[], size_t size) {
 DataBase::Build::Build(string table_path, void(*callback)(int, std::string msg)) {
   std::fstream inFstream;
   inFstream.open(table_path, std::ios::in);
+  if (!inFstream) {
+    callback(EXIT_FAILURE, "load path is failure!!!");
+  }
   char c[1024];
 
   while (inFstream.getline(c, sizeof(c), '\n')) {
@@ -65,6 +71,8 @@ DataBase::Build::Build(string table_path, void(*callback)(int, std::string msg))
 DataBase::Build * DataBase::load(string table_path, void (*callback)(int, string)) {
   if (build_instance == NULL)
       build_instance = new Build(table_path, callback);
+
+  table.path = table_path;
   callback(EXIT_SUCCESS, "載入完成\n");
   return build_instance;
 }

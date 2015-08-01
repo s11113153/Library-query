@@ -20,7 +20,7 @@ public:
     Display, Insert, Delete, Modify, Copy, Filter, Query, Save, Quit, None
   };
   static void launch(DataBase::Build build);
-
+  
 private:
   static map<string, Command> commands;
 
@@ -44,7 +44,7 @@ private:
   static CommandContent getCommand(vector<string> inputs);
 
   static void printlnLog(string msg);
-  static void proces(CommandContent cc);
+  static bool proces(CommandContent cc);
   static int getBookFieldIndex(string key);
 };
 

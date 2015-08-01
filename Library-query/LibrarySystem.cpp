@@ -22,7 +22,7 @@ map<string, LibrarySystem::Command> LibrarySystem::commands = {
 
 void LibrarySystem::launch(DataBase::Build build) {
   std::string readLine;
-
+  
   while (std::getline(std::cin, readLine)) {
     char split_char = ' ';
     vector<string> inputs;
@@ -33,8 +33,10 @@ void LibrarySystem::launch(DataBase::Build build) {
       printlnLog("不要輸入空白鍵!!");
       continue;
     }
-    proces(getCommand(inputs));
-    inputs.clear();
+
+    if (!proces(getCommand(inputs))) {
+      break;
+    }
   }
 }
 
@@ -55,6 +57,7 @@ LibrarySystem::CommandContent LibrarySystem::getCommand(vector<string> inputs) {
     inputs.erase(inputs.begin());
     cc.content = inputs;
   }
+
   return cc;
 }
 
@@ -73,13 +76,13 @@ int LibrarySystem::getBookFieldIndex(string key) {
   return -1;
 }
 
-
-void LibrarySystem::proces(LibrarySystem::CommandContent cc) {
+// TODO: - [filter, query] not implement
+bool LibrarySystem::proces(LibrarySystem::CommandContent cc) {
   size_t size = cc.content.size();
 
   if (cc.command == None) {
     printlnLog("開頭指令錯誤!!");
-    return;
+    return true;
   }
 
   if (cc.command == Display && size == CommandContent::CheckFormatSize::Display) {
@@ -91,7 +94,7 @@ void LibrarySystem::proces(LibrarySystem::CommandContent cc) {
         book.year, book.place.c_str()
       );
     }
-    return;
+    return true;
   }
 
   if (cc.command == Insert && size == CommandContent::CheckFormatSize::Insert) {
@@ -103,7 +106,8 @@ void LibrarySystem::proces(LibrarySystem::CommandContent cc) {
     book.publisher = cc.content[Book::FiledIndex::publisher];
     book.place     = cc.content[Book::FiledIndex::place];
     DataBase::table.book_record.push_back(book);
-    return;
+    printlnLog("insert: [" + to_string(book.book_id) + "] successful!!!");
+    return true;
   }
 
   if (cc.command == Delete && size == CommandContent::CheckFormatSize::Delete) {
@@ -115,7 +119,7 @@ void LibrarySystem::proces(LibrarySystem::CommandContent cc) {
           break;
       }
     }
-    return;
+    return true;
   }
 
   if (cc.command == Modify && size == CommandContent::CheckFormatSize::Modify) {
@@ -132,34 +136,72 @@ void LibrarySystem::proces(LibrarySystem::CommandContent cc) {
           case Book::FiledIndex::book_id:
             DataBase::table.book_record[i].book_id = atoi(value.c_str());
             printlnLog(msg_ok);
-            return;
+            return true;
           case Book::FiledIndex::book_name:
             DataBase::table.book_record[i].book_name = value;
             printlnLog(msg_ok);
-            return;
+            return true;
           case Book::FiledIndex::authors:
             DataBase::table.book_record[i].authors = value;
             printlnLog(msg_ok);
-            return;
+            return true;
           case Book::FiledIndex::publisher:
             DataBase::table.book_record[i].publisher = value;
             printlnLog(msg_ok);
-            return;
+            return true;
           case Book::FiledIndex::year:
             DataBase::table.book_record[i].year = atoi(value.c_str());
             printlnLog(msg_ok);
-            return;
+            return true;
           case Book::FiledIndex::place:
             DataBase::table.book_record[i].place = value;
             printlnLog(msg_ok);
-            return;
+            return true;
           default: {
             printlnLog(msg_no);
-            return;
+            return true;
           }
         }
       }
     }
   }
+
+  if (cc.command == Copy && size == CommandContent::CheckFormatSize::Copy) {
+    DataBase::table.tmp = DataBase::table.book_record;
+    printlnLog("copy successful!!!");
+    return true;
+  }
+
+  if (cc.command == Save && size == CommandContent::CheckFormatSize::Save) {
+    std::fstream writeFstream;
+    char split_char = '#';
+    writeFstream.open(DataBase::table.path  , std::ios::out);
+    if (!writeFstream) {
+      printlnLog("write book_db.dat is failure !!!");
+      return true;
+    }
+    for (int i = 0; i < DataBase::table.book_record.size(); i++) {
+      Book book = DataBase::table.book_record[i];
+      writeFstream << book.book_id    << split_char;
+      writeFstream << book.authors    << split_char;
+      writeFstream << book.book_name  << split_char;
+      writeFstream << book.publisher  << split_char;
+      writeFstream << book.year       << split_char;
+      writeFstream << book.place      << endl;
+    }
+    writeFstream.close();
+    printlnLog("save is successful !!!");
+    return true;
+  }
+
+  if (cc.command == Query && size == CommandContent::CheckFormatSize::Query) {
+    return true;
+  }
+
+  if (cc.command == Quit && size == CommandContent::CheckFormatSize::Quit) {
+    return false;
+  }
+  
+  return true;
 }
 

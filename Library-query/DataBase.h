@@ -25,7 +25,10 @@ class DataBase {
   public:
     static class Table {
       public:
+        static string path;
         static vector<Book> book_record;
+        static vector<Book> tmp;
+        static vector<Book> tmp2;
     } table;
 
     class Build {
