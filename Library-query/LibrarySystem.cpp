@@ -33,25 +33,45 @@ void LibrarySystem::launch(DataBase::Build build) {
       printlnLog("不要輸入空白鍵!!");
       continue;
     }
-    Command command = getCommand(inputs.at(0));
-    proces(command, inputs, inputs.size() - 1);
+    proces(getCommand(inputs));
     inputs.clear();
   }
 }
+
+
+LibrarySystem::CommandContent LibrarySystem::getCommand(vector<string> inputs) {
+  CommandContent cc;
+  cc.command = None;
+
+  if (inputs.empty())
+      return cc;
+
+  map<string, Command>::iterator it = commands.find(inputs.at(0));
+  if (it != commands.end()) {
+    cc.command = it->second;
+  }
+
+  if (inputs.size() > 1) {
+    inputs.erase(inputs.begin());
+    cc.content = inputs;
+  }
+  return cc;
+}
+
 
 void LibrarySystem::printlnLog(string msg) {
   fprintf(stdout, "%s\n", msg.c_str());
 }
 
-void LibrarySystem::proces(
-        LibrarySystem::Command command, vector<string> inputs, size_t size) {
+void LibrarySystem::proces(LibrarySystem::CommandContent cc) {
+  size_t size = cc.content.size();
 
-  if (command == None) {
+  if (cc.command == None) {
     printlnLog("開頭指令錯誤!!");
     return;
   }
 
-  if (command == Display && size == LibrarySystem::CommandFormatSize::Display) {
+  if (cc.command == Display && size == CommandContent::CheckFormatSize::Display) {
     for (int i = 0; i < DataBase::table.book_record.size(); i++) {
       Book book = DataBase::table.book_record[i];
       fprintf(stdout,
@@ -60,9 +80,31 @@ void LibrarySystem::proces(
         book.year, book.place.c_str()
       );
     }
+    return;
   }
 
-  if (command == Insert && size == LibrarySystem::CommandFormatSize::Insert) {
+  if (cc.command == Insert && size == CommandContent::CheckFormatSize::Insert) {
+    Book book;
+    book.book_id   = atoi(cc.content[Book::FiledIndex::book_id].c_str());
+    book.year      = atoi(cc.content[Book::FiledIndex::year].c_str());
+    book.authors   = cc.content[Book::FiledIndex::authors];
+    book.book_name = cc.content[Book::FiledIndex::book_name];
+    book.publisher = cc.content[Book::FiledIndex::publisher];
+    book.place     = cc.content[Book::FiledIndex::place];
+    DataBase::table.book_record.push_back(book);
+    return;
+  }
+
+  if (cc.command == Delete && size == CommandContent::CheckFormatSize::Delete) {
+    for (int i = 0; i < DataBase::table.book_record.size(); i++) {
+      int book_id = atoi(cc.content[Book::FiledIndex::book_id].c_str());
+      if (DataBase::table.book_record[i].book_id == book_id) {
+          DataBase::table.book_record.erase(DataBase::table.book_record.begin() + i);
+          printlnLog("Delete: [" + to_string(book_id) + "] Success!!");
+          break;
+      }
+    }
+    return;
   }
 }
 

@@ -24,27 +24,27 @@ public:
 private:
   static map<string, Command> commands;
 
-  static inline Command getCommand(std::string str) {
-    map<string, Command>::iterator it = commands.find(str);
-    if (it != commands.end())
-        return  it->second;
-    return None;
-  }
+  struct CommandContent {
+    Command command;
+    vector<string> content;
 
-  struct CommandFormatSize {
-    static const int Display = 0;
-    static const int Insert  = 6;
-    static const int Delete  = 1;
-    static const int Modify  = 3;
-    static const int Copy    = 0;
-//    static const int Filter  = 1;
-    static const int Query   = 0;
-    static const int Save    = 0;
-    static const int Quit    = 0;
+    struct CheckFormatSize {
+      static const int Display = 0;
+      static const int Insert  = 6;
+      static const int Delete  = 1;
+      static const int Modify  = 3;
+      static const int Copy    = 0;
+      //    static const int Filter  = 1;
+      static const int Query   = 0;
+      static const int Save    = 0;
+      static const int Quit    = 0;
+    };
   };
 
+  static CommandContent getCommand(vector<string> inputs);
+
   static void printlnLog(string msg);
-  static void proces(Command command, vector<string> inputs, size_t size);
+  static void proces(CommandContent cc);
 };
 
 
