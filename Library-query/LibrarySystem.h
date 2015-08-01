@@ -34,7 +34,7 @@ private:
       static const int Delete  = 1;
       static const int Modify  = 3;
       static const int Copy    = 0;
-      //    static const int Filter  = 1;
+      static const int Filter  = 2;
       static const int Query   = 0;
       static const int Save    = 0;
       static const int Quit    = 0;

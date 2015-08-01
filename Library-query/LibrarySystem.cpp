@@ -126,13 +126,13 @@ bool LibrarySystem::proces(LibrarySystem::CommandContent cc) {
     int book_id = atoi(cc.content[0].c_str());
     string key = cc.content[1];
     string value = cc.content[2];
-    int bookFiledIndex = getBookFieldIndex(key);
+    int bookFieldIndex = getBookFieldIndex(key);
     string msg_ok = "modify successful!!!";
     string msg_no = "modify failure, key not fonud !!!";
 
     for (int i = 0; i < DataBase::table.book_record.size(); i++) {
       if (DataBase::table.book_record[i].book_id == book_id) {
-        switch (bookFiledIndex) {
+        switch (bookFieldIndex) {
           case Book::FiledIndex::book_id:
             DataBase::table.book_record[i].book_id = atoi(value.c_str());
             printlnLog(msg_ok);
@@ -167,6 +167,7 @@ bool LibrarySystem::proces(LibrarySystem::CommandContent cc) {
   }
 
   if (cc.command == Copy && size == CommandContent::CheckFormatSize::Copy) {
+    DataBase::table.tmp.clear();
     DataBase::table.tmp = DataBase::table.book_record;
     printlnLog("copy successful!!!");
     return true;
@@ -194,14 +195,80 @@ bool LibrarySystem::proces(LibrarySystem::CommandContent cc) {
     return true;
   }
 
+  if (cc.command == Filter && size == CommandContent::CheckFormatSize::Filter) {
+    string key  = cc.content[0];
+    string value = cc.content[1];
+    DataBase::table.tmp2.clear();
+
+    for (int i = 0; i < DataBase::table.tmp.size(); i++) {
+      bool isSearch = false;
+      Book book = DataBase::table.tmp[i];
+      int bookFieldIndex = getBookFieldIndex(key);
+
+      switch (bookFieldIndex) {
+        case Book::FiledIndex::book_id: {
+          string strId = to_string(book.book_id);
+          if (strId.find(value) != std::string::npos)
+              isSearch = true;
+          break;
+        }
+
+        case Book::FiledIndex::book_name:
+          if (book.book_name.find(value) != std::string::npos)
+              isSearch = true;
+          break;
+
+        case Book::FiledIndex::authors:
+          if (book.authors.find(value) != std::string::npos)
+              isSearch = true;
+          break;
+
+        case Book::FiledIndex::publisher:
+          if (book.publisher.find(value) != std::string::npos)
+              isSearch = true;
+          break;
+
+        case Book::FiledIndex::year: {
+          string strYear = to_string(book.year);
+          if (strYear.find(value) != std::string::npos)
+              isSearch = true;
+          break;
+        }
+
+        case Book::FiledIndex::place:
+          if (book.place.find(value) != std::string::npos)
+              isSearch = true;
+          break;
+
+        default:
+          break;
+      }
+      if (isSearch) {
+        DataBase::table.tmp2.push_back(book);
+      }
+    }
+
+    DataBase::table.tmp = DataBase::table.tmp2;
+    return true;
+  }
+
   if (cc.command == Query && size == CommandContent::CheckFormatSize::Query) {
+    for (int i = 0; i < DataBase::table.tmp.size(); i++) {
+      Book book = DataBase::table.tmp[i];
+      fprintf(stdout,
+        "book_id=%d, authors=%s, book_name=%s, publisher=%s, year=%d, place=%s\n",
+        book.book_id, book.authors.c_str(), book.book_name.c_str(), book.publisher.c_str(),
+        book.year, book.place.c_str()
+      );
+    }
     return true;
   }
 
   if (cc.command == Quit && size == CommandContent::CheckFormatSize::Quit) {
     return false;
   }
-  
+
+  printlnLog("command parameter is error!!!");
   return true;
 }
 
